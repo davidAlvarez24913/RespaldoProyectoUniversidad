@@ -1,0 +1,769 @@
+{
+  "paragraphs": [
+    {
+      "text": "import org.apache.spark.sql.types._\nval myDataSchema \u003d StructType(\n    Array(\n        StructField(\"id_persona\", DecimalType(26, 0), true), \n        StructField(\"anio\", IntegerType, true), \n        StructField(\"mes\", IntegerType, true), \n        StructField(\"provincia\", IntegerType, true), \n        StructField(\"canton\", IntegerType, true), \n        StructField(\"area\", StringType, true), \n        StructField(\"genero\", StringType, true), \n        StructField(\"edad\", IntegerType, true), \n        StructField(\"estado_civil\", StringType, true), \n        StructField(\"nivel_de_instruccion\", StringType, true), \n        StructField(\"etnia\", StringType, true), \n        StructField(\"ingreso_laboral\", IntegerType, true), \n        StructField(\"condicion_actividad\", StringType, true), \n        StructField(\"sectorizacion\", StringType, true), \n        StructField(\"grupo_ocupacion\", StringType, true), \n        StructField(\"rama_actividad\", StringType, true), \n        StructField(\"factor_expansion\", DoubleType, true)\n    ));\nval df \u003d spark.read.schema(myDataSchema).option(\"header\",\"true\").option(\"delimiter\",\"\\t\").csv(\"/home/david/Datos_ENEMDU_PEA_v2.csv\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:55:00.302",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.sql.types._\n\u001b[1m\u001b[34mmyDataSchema\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.types.StructType\u001b[0m \u003d StructType(StructField(id_persona,DecimalType(26,0),true), StructField(anio,IntegerType,true), StructField(mes,IntegerType,true), StructField(provincia,IntegerType,true), StructField(canton,IntegerType,true), StructField(area,StringType,true), StructField(genero,StringType,true), StructField(edad,IntegerType,true), StructField(estado_civil,StringType,true), StructField(nivel_de_instruccion,StringType,true), StructField(etnia,StringType,true), StructField(ingreso_laboral,IntegerType,true), StructField(condicion_actividad,StringType,true), StructField(sectorizacion,StringType,true), StructField(grupo_ocupacion,StringType,true), StructField(rama_actividad,StringType,true), St..."
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593866349283_-1283944485",
+      "id": "paragraph_1593866349283_-1283944485",
+      "dateCreated": "2020-07-04 07:39:09.285",
+      "dateStarted": "2020-07-06 09:41:15.050",
+      "dateFinished": "2020-07-06 09:41:30.393",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val dfFactExpasion\u003d df.drop(\"id_persona\").select($\"factor_expansion\").filter(\"factor_expansion is NOT NULL\")\nval cuartiles \u003d dfFactExpasion.stat.approxQuantile(\"factor_expansion\",Array(0.25,0.75),0.00)\nval dest\u003d dfFactExpasion.select(stddev(\"factor_expansion\")).first()(0).asInstanceOf[Double]\nval avg\u003d dfFactExpasion.select(mean(\"factor_expansion\")).first()(0).asInstanceOf[Double]\n\n//taller.summary().show",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:41:33.520",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mdfFactExpasion\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [factor_expansion: double]\n\u001b[1m\u001b[34mcuartiles\u001b[0m: \u001b[1m\u001b[32mArray[Double]\u001b[0m \u003d Array(65.6557619484987, 316.44524009314)\n\u001b[1m\u001b[34mdest\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 246.84475072652276\n\u001b[1m\u001b[34mavg\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 230.44574429932652\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594042389961_-1982267842",
+      "id": "paragraph_1594042389961_-1982267842",
+      "dateCreated": "2020-07-06 08:33:09.961",
+      "dateStarted": "2020-07-06 09:41:33.549",
+      "dateFinished": "2020-07-06 09:42:13.351",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val minimo \u003d dest - 3 * avg\nval maximo \u003d dest + 3 * avg\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:42:17.619",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mminimo\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d -444.4924821714568\n\u001b[1m\u001b[34mmaximo\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 938.1819836245023\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594043428112_-517436735",
+      "id": "paragraph_1594043428112_-517436735",
+      "dateCreated": "2020-07-06 08:50:28.113",
+      "dateStarted": "2020-07-06 09:42:17.638",
+      "dateFinished": "2020-07-06 09:42:18.823",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val valoresMenoresli  \u003d dfFactExpasion.where($\"factor_expansion\" \u003c minimo)\n\nvaloresMenoresli.describe().show",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:42:26.390",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+----------------+\n|summary|factor_expansion|\n+-------+----------------+\n|  count|               0|\n|   mean|            null|\n| stddev|            null|\n|    min|            null|\n|    max|            null|\n+-------+----------------+\n\n\u001b[1m\u001b[34mvaloresMenoresli\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [factor_expansion: double]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594043197104_1289216330",
+      "id": "paragraph_1594043197104_1289216330",
+      "dateCreated": "2020-07-06 08:46:37.104",
+      "dateStarted": "2020-07-06 09:42:26.408",
+      "dateFinished": "2020-07-06 09:42:34.725",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val valoresMayoresls  \u003d dfFactExpasion.where($\"factor_expansion\" \u003e  maximo)\nvaloresMayoresls.describe().show",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:42:39.087",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+------------------+\n|summary|  factor_expansion|\n+-------+------------------+\n|  count|             11492|\n|   mean| 1293.051048753701|\n| stddev|389.06300715083034|\n|    min|  939.043353393812|\n|    max|  4401.96321641217|\n+-------+------------------+\n\n\u001b[1m\u001b[34mvaloresMayoresls\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [factor_expansion: double]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594043565977_-161000652",
+      "id": "paragraph_1594043565977_-161000652",
+      "dateCreated": "2020-07-06 08:52:45.977",
+      "dateStarted": "2020-07-06 09:42:39.101",
+      "dateFinished": "2020-07-06 09:42:46.598",
+      "status": "FINISHED"
+    },
+    {
+      "title": "cálculo de IQR",
+      "text": "val q1 \u003d 65.6557619484987\nval q3 \u003d  316.44524009314\nval iqr \u003d q3 - q1\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:42:49.136",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mq1\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 65.6557619484987\n\u001b[1m\u001b[34mq3\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 316.44524009314\n\u001b[1m\u001b[34miqr\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 250.7894781446413\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594044192287_-748539999",
+      "id": "paragraph_1594044192287_-748539999",
+      "dateCreated": "2020-07-06 09:03:12.287",
+      "dateStarted": "2020-07-06 09:42:49.170",
+      "dateFinished": "2020-07-06 09:42:50.791",
+      "status": "FINISHED"
+    },
+    {
+      "title": "limites iqr",
+      "text": "val inferioriqr  \u003d q1 - 1.5 *iqr\nval superioriqr  \u003d q3 + 1.5*iqr",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:42:54.536",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34minferioriqr\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d -310.52845526846323\n\u001b[1m\u001b[34msuperioriqr\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 692.629457310102\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594044314526_-67586437",
+      "id": "paragraph_1594044314526_-67586437",
+      "dateCreated": "2020-07-06 09:05:14.526",
+      "dateStarted": "2020-07-06 09:42:54.556",
+      "dateFinished": "2020-07-06 09:42:55.806",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val dfSinOutliers \u003d dfFactExpasion.where($\"factor_expansion\" \u003e inferioriqr  \u0026\u0026 $\"factor_expansion\" \u003c superioriqr).withColumn(\"factor_expansion\", format_number($\"factor_expansion\", 3))\ndfSinOutliers.summary().show",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:43:00.294",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+------------------+\n|summary|  factor_expansion|\n+-------+------------------+\n|  count|            590758|\n|   mean|190.36949131623663|\n| stddev|163.50343072199365|\n|    min|            10.039|\n|    25%|            62.925|\n|    50%|           130.665|\n|    75%|            278.09|\n|    max|            99.996|\n+-------+------------------+\n\n\u001b[1m\u001b[34mdfSinOutliers\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [factor_expansion: string]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594043623322_666608239",
+      "id": "paragraph_1594043623322_666608239",
+      "dateCreated": "2020-07-06 08:53:43.322",
+      "dateStarted": "2020-07-06 09:43:00.307",
+      "dateFinished": "2020-07-06 09:43:17.090",
+      "status": "FINISHED"
+    },
+    {
+      "title": "Cantidad por diferentes rangos",
+      "text": "val rangos \u003d dfSinOutliers.withColumn(\"range\", when($\"factor_expansion\" \u003e  0 and $\"factor_expansion\" \u003c\u003d q1, lit(\"0 a  q1\"))\n                .otherwise(when($\"factor_expansion\" \u003e q1 and $\"factor_expansion\" \u003c\u003d q3-q1, lit(\" q1 a q2\"))\n                .otherwise(when($\"factor_expansion\" \u003e q3 - q1 and $\"factor_expansion\" \u003c\u003d q3, lit(\"q2 a q3\"))\n                .otherwise(when($\"factor_expansion\" \u003e q3 and $\"factor_expansion\" \u003c\u003d superioriqr, lit(\"q3 a limite iqr\"))\n                ) ) ) \n\n         ).groupBy(\"range\").count().orderBy(\"range\")\nrangos.show\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:46:00.493",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------------+------+\n|          range| count|\n+---------------+------+\n|        q1 a q2|268957|\n|        0 a  q1|155678|\n|        q2 a q3| 42466|\n|q3 a limite iqr|123657|\n+---------------+------+\n\n\u001b[1m\u001b[34mrangos\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [range: string, count: bigint]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594044751029_1282486459",
+      "id": "paragraph_1594044751029_1282486459",
+      "dateCreated": "2020-07-06 09:12:31.030",
+      "dateStarted": "2020-07-06 09:46:00.512",
+      "dateFinished": "2020-07-06 09:46:17.490",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val total \u003d dfSinOutliers.count\nval porcentaje \u003d rangos.select($\"range\",$\"count\"/total *100).withColumnRenamed(\"((count / 590758) * 100)\",\"porcentaje\")\nval resultado \u003d rangos.join(porcentaje,Seq(\"range\")).withColumn(\"porcentaje\", format_number($\"porcentaje\", 3)).sort(desc(\"porcentaje\"))\nresultado.show",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 09:54:19.766",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------------+------+----------+\n|          range| count|porcentaje|\n+---------------+------+----------+\n|        q2 a q3| 42466|     7.188|\n|        q1 a q2|268957|    45.527|\n|        0 a  q1|155678|    26.352|\n|q3 a limite iqr|123657|    20.932|\n+---------------+------+----------+\n\n\u001b[1m\u001b[34mtotal\u001b[0m: \u001b[1m\u001b[32mLong\u001b[0m \u003d 590758\n\u001b[1m\u001b[34mporcentaje\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m \u003d [range: string, porcentaje: double]\n\u001b[1m\u001b[34mresultado\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [range: string, count: bigint ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594045981519_-1612635442",
+      "id": "paragraph_1594045981519_-1612635442",
+      "dateCreated": "2020-07-06 09:33:01.519",
+      "dateStarted": "2020-07-06 09:54:19.784",
+      "dateFinished": "2020-07-06 09:54:45.652",
+      "status": "FINISHED"
+    },
+    {
+      "text": "\u0026md\npractica",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-06 08:49:59.304",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594043390957_1594880202",
+      "id": "paragraph_1594043390957_1594880202",
+      "dateCreated": "2020-07-06 08:49:50.957",
+      "status": "READY"
+    },
+    {
+      "text": "val data2\u003d df.drop(\"id_persona\").select($\"ingreso_laboral\").filter(\"ingreso_laboral is NOT  NULL\")\ndata2.summary().show\nval inilimit \u003d0\nval finlimit \u003d 146030\nval david \u003d data2.stat.approxQuantile(\"ingreso_laboral\",Array(0.25,0.5,0.75,1),0.00)",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:51:33.226",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+------------------+\n|summary|   ingreso_laboral|\n+-------+------------------+\n|  count|            504742|\n|   mean|487.10984027483346|\n| stddev| 767.7250086176327|\n|    min|                 0|\n|    25%|               170|\n|    50%|               370|\n|    75%|               588|\n|    max|            146030|\n+-------+------------------+\n\n\u001b[1m\u001b[34mdata2\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [ingreso_laboral: int]\n\u001b[1m\u001b[34minilimit\u001b[0m: \u001b[1m\u001b[32mInt\u001b[0m \u003d 0\n\u001b[1m\u001b[34mfinlimit\u001b[0m: \u001b[1m\u001b[32mInt\u001b[0m \u003d 146030\n\u001b[1m\u001b[34mdavid\u001b[0m: \u001b[1m\u001b[32mArray[Double]\u001b[0m \u003d Array(170.0, 370.0, 588.0, 146030.0)\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593866397555_300246640",
+      "id": "paragraph_1593866397555_300246640",
+      "dateCreated": "2020-07-04 07:39:57.555",
+      "dateStarted": "2020-07-04 20:51:33.269",
+      "dateFinished": "2020-07-04 20:52:47.001",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\ndavid.explain(extended \u003d true)\nla variable david deberìa ser un dataframe para que se pueda ejecutar el\ncòdigo anterior.\nFuente: https://blog.bi-geek.com/spark-sql-optimizador-catalyst/",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:52:47.046",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/text",
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003edavid.explain(extended \u003d true)\u003cbr /\u003e\nla variable david deberìa ser un dataframe para que se pueda ejecutar el\u003cbr /\u003e\ncòdigo anterior.\u003cbr /\u003e\nFuente: \u003ca href\u003d\"https://blog.bi-geek.com/spark-sql-optimizador-catalyst/\"\u003ehttps://blog.bi-geek.com/spark-sql-optimizador-catalyst/\u003c/a\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593881174148_635664831",
+      "id": "paragraph_1593881174148_635664831",
+      "dateCreated": "2020-07-04 11:46:14.148",
+      "dateStarted": "2020-07-04 20:52:47.099",
+      "dateFinished": "2020-07-04 20:52:47.491",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val dest\u003d data2.select(stddev(\"ingreso_laboral\")).first()(0).asInstanceOf[Double]\nval avg\u003d data2.select(mean(\"ingreso_laboral\")).first()(0).asInstanceOf[Double]",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:59:56.476",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mdest\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 767.7250086176327\n\u001b[1m\u001b[34mavg\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 487.10984027483346\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593913807231_-978087058",
+      "id": "paragraph_1593913807231_-978087058",
+      "dateCreated": "2020-07-04 20:50:07.231",
+      "dateStarted": "2020-07-04 20:59:56.492",
+      "dateFinished": "2020-07-04 21:00:12.491",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val li \u003d dest - 3 * avg\nval ls \u003d dest + 3 * avg",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 21:08:12.879",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mli\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d -693.6045122068676\n\u001b[1m\u001b[34mls\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 2229.054529442133\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593876828959_2073452585",
+      "id": "paragraph_1593876828959_2073452585",
+      "dateCreated": "2020-07-04 10:33:48.959",
+      "dateStarted": "2020-07-04 21:08:12.897",
+      "dateFinished": "2020-07-04 21:08:14.073",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val newslimits \u003d data2.filter(expr(\"ingreso_laboral\") \u003c\u003d ls)\nnewslimits.toDF.summary().show\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 21:11:17.344",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+-----------------+\n|summary|  ingreso_laboral|\n+-------+-----------------+\n|  count|           497044|\n|   mean|435.3529385728426|\n| stddev|378.2715590246983|\n|    min|                0|\n|    25%|              165|\n|    50%|              360|\n|    75%|              564|\n|    max|             2229|\n+-------+-----------------+\n\n\u001b[1m\u001b[34mnewslimits\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.Dataset[org.apache.spark.sql.Row]\u001b[0m \u003d [ingreso_laboral: int]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593914772228_458799280",
+      "id": "paragraph_1593914772228_458799280",
+      "dateCreated": "2020-07-04 21:06:12.228",
+      "dateStarted": "2020-07-04 21:11:17.364",
+      "dateFinished": "2020-07-04 21:11:27.451",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nFalta sacar la frecuencia entre cuartiles",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:52:49.323",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/text",
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eFalta sacar la frecuencia entre cuartiles\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593881601624_-839057103",
+      "id": "paragraph_1593881601624_-839057103",
+      "dateCreated": "2020-07-04 11:53:21.624",
+      "dateStarted": "2020-07-04 20:52:49.352",
+      "dateFinished": "2020-07-04 20:52:49.392",
+      "status": "FINISHED"
+    },
+    {
+      "text": "val inicio \u003d 370.0 - ( 1.5 * (588.0 - 370.0 ) )\nval fin \u003d 588.0 + ( 1.5 *  (588.0 - 370.0 ) )",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:52:49.433",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34minicio\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 43.0\n\u001b[1m\u001b[34mfin\u001b[0m: \u001b[1m\u001b[32mDouble\u001b[0m \u003d 915.0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593877498975_1910789743",
+      "id": "paragraph_1593877498975_1910789743",
+      "dateCreated": "2020-07-04 10:44:58.975",
+      "dateStarted": "2020-07-04 20:52:49.442",
+      "dateFinished": "2020-07-04 20:52:50.087",
+      "status": "FINISHED"
+    },
+    {
+      "text": "%md\nfuente :https://www.interempresas.net/Mineria/Articulos/132206-Clasificacion-muestras-deteccion-outliers-caracterizacion-geotecnica-del-terreno.html",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-04 20:52:50.144",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/text",
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003efuente :\u003ca href\u003d\"https://www.interempresas.net/Mineria/Articulos/132206-Clasificacion-muestras-deteccion-outliers-caracterizacion-geotecnica-del-terreno.html\"\u003ehttps://www.interempresas.net/Mineria/Articulos/132206-Clasificacion-muestras-deteccion-outliers-caracterizacion-geotecnica-del-terreno.html\u003c/a\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1593866494762_1284070576",
+      "id": "paragraph_1593866494762_1284070576",
+      "dateCreated": "2020-07-04 07:41:34.762",
+      "dateStarted": "2020-07-04 20:52:50.165",
+      "dateFinished": "2020-07-04 20:52:50.231",
+      "status": "FINISHED"
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594041322348_-1254004387",
+      "id": "paragraph_1594041322348_-1254004387",
+      "dateCreated": "2020-07-06 08:15:22.348",
+      "status": "READY"
+    }
+  ],
+  "name": "outliers",
+  "id": "2FD39VH1Y",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
