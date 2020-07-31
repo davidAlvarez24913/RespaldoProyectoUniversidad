@@ -1,4 +1,5 @@
-  <iframe src="https://4be86d7ab502.ngrok.io/#/notebook/2FBV8R4MG/paragraph/paragraph_1592868428236_-95018284?asIframe" style="width: 600px; height: 100px; border:0px"</iframe>
+<h2> Primera Gráfica </h2>  
+  <iframe src="https://4be86d7ab502.ngrok.io/#/notebook/2FBV8R4MG/paragraph/paragraph_1592868428236_-95018284?asIframe" style="width: 600px; height: 100px;   border: 0px"</iframe>
 
 <h2> Segunda Gráfica </h2>  
 
